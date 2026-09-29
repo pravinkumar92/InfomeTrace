@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #F7F7F5;
+  --color-surface: #FFFFFF;
+  --color-ink: #171719;
+  --color-muted: #52545A;
+  --color-ui-border: #D9DADD;
+  --color-ui-bg: #F7F7F5;
+  
+  --color-maroon: #6E1F2A;
+  --color-burgundy: #3B1118;
+  --color-maroon-soft: #F3E5E7;
+  
+  --color-accent: #6E1F2A;
+  
+  --color-critical: #B42318;
+  --color-critical-soft: #FDECEC;
+  
+  --color-error: #C41E3A;
+  --color-success: #27AE60;
+  
+  --color-verified: #16704A;
+  --color-verified-soft: #E8F5EF;
+  
+  --color-info: #315C7D;
+  
+  --color-simulation: #A56A16;
+  --color-simulation-soft: #FBF3E4;
+
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --animate-pulse-slow: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-pan-slow: pan-slow 40s linear infinite;
+  
+  --animate-flow-slow: flow 45s ease-in-out infinite alternate;
+  --animate-flow-medium: flow 30s ease-in-out infinite alternate;
+  --animate-flow-slow-reverse: flow-reverse 40s ease-in-out infinite alternate;
+  --animate-pulse-very-slow: pulse-slow 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  @keyframes pan-slow {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-400px, -400px); }
+  }
+  
+  @keyframes flow {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-3vw, 2vh) scale(1.05); }
+  }
+
+  @keyframes flow-reverse {
+    0% { transform: translate(0, 0) scale(1.05); }
+    100% { transform: translate(2vw, -3vh) scale(1); }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.react-flow__node {
+  border-radius: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+}
