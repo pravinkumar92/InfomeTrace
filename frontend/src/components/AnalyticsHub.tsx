@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { InvestigationResponse } from '../api/types';
 
 interface RiskScore {
@@ -9,7 +9,7 @@ interface RiskScore {
     supplier_reliability: number;
     storage_duration: number;
     downstream_impact: number;
-    seasonality: number;
+    status_flag: number;
   };
   recommendation: string;
 }
@@ -19,49 +19,24 @@ export const AnalyticsHub: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data - replace with API call
-    const mockRiskData: RiskScore[] = [
-      {
-        batch_id: 'B001',
-        ingredient: 'Organic Tomatoes',
-        overall_risk: 35,
-        factors: {
-          supplier_reliability: 90,
-          storage_duration: 45,
-          downstream_impact: 25,
-          seasonality: 80
-        },
-        recommendation: 'Low risk - Continue monitoring'
-      },
-      {
-        batch_id: 'B002',
-        ingredient: 'Paneer Block',
-        overall_risk: 78,
-        factors: {
-          supplier_reliability: 65,
-          storage_duration: 85,
-          downstream_impact: 90,
-          seasonality: 70
-        },
-        recommendation: 'High risk - Immediate inspection required'
-      },
-      {
-        batch_id: 'B003',
-        ingredient: 'Basmati Rice',
-        overall_risk: 42,
-        factors: {
-          supplier_reliability: 85,
-          storage_duration: 30,
-          downstream_impact: 50,
-          seasonality: 95
-        },
-        recommendation: 'Medium risk - Schedule quality check'
-      }
-    ];
-    
-    setRiskData(mockRiskData);
-    setLoading(false);
+    fetchRiskData();
   }, []);
+
+  const fetchRiskData = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/analytics/risk');
+      if (!response.ok) {
+        throw new Error('Failed to fetch risk analytics');
+      }
+      const data = await response.json();
+      setRiskData(data.risk_scores || []);
+    } catch (error) {
+      console.error('Error fetching risk analytics:', error);
+      setRiskData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getRiskColor = (risk: number) => {
     if (risk >= 70) return 'text-critical';
@@ -200,15 +175,15 @@ export const AnalyticsHub: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-2">Seasonality Risk</div>
+                    <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-2">Status Flag</div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-canvas">
                         <div 
                           className="h-full bg-[#9B59B6]" 
-                          style={{ width: `${batch.factors.seasonality}%` }}
+                          style={{ width: `${batch.factors.status_flag}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs font-mono font-bold text-ink">{batch.factors.seasonality}%</span>
+                      <span className="text-xs font-mono font-bold text-ink">{batch.factors.status_flag}%</span>
                     </div>
                   </div>
                 </div>

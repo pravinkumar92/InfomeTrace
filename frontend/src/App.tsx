@@ -1,20 +1,23 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { InvestigationConsole } from './components/InvestigationConsole';
 import { ImpactSummary } from './components/ImpactSummary';
 import { ImpactGraph } from './components/ImpactGraph';
 import { RecallSimulator } from './components/RecallSimulator';
+import { RecallNotificationCenter } from './components/RecallNotificationCenter';
 import { ViewCypher } from './components/ViewCypher';
 import { TraceAssist } from './components/TraceAssist';
 import { BackgroundAnimation } from './components/BackgroundAnimation';
 import { StatusDashboard } from './components/StatusDashboard';
 import { AnalyticsHub } from './components/AnalyticsHub';
+import { CustomerView } from './components/CustomerView';
+import { KitchenView } from './components/KitchenView';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { investigateEntity } from './api/investigation';
 import { recallBatch } from './api/recall';
 import type { InvestigationResponse, SimulateContainmentResponse } from './api/types';
 
-type ViewMode = 'dashboard' | 'investigation' | 'analytics';
+type ViewMode = 'dashboard' | 'investigation' | 'analytics' | 'customer' | 'kitchen';
 
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
@@ -82,7 +85,7 @@ function App() {
                   : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
               }`}
             >
-              🚨 Command Center
+              Command Center
             </button>
             <button
               onClick={() => setViewMode('investigation')}
@@ -92,7 +95,7 @@ function App() {
                   : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
               }`}
             >
-              🔍 Investigation Console
+              Investigation Console
             </button>
             <button
               onClick={() => setViewMode('analytics')}
@@ -102,7 +105,27 @@ function App() {
                   : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
               }`}
             >
-              📊 Risk Analytics
+              Risk Analytics
+            </button>
+            <button
+              onClick={() => setViewMode('customer')}
+              className={`px-6 py-3 font-bold text-sm tracking-wider uppercase transition-all ${
+                viewMode === 'customer'
+                  ? 'bg-accent text-surface border-2 border-accent'
+                  : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
+              }`}
+            >
+              Customer View
+            </button>
+            <button
+              onClick={() => setViewMode('kitchen')}
+              className={`px-6 py-3 font-bold text-sm tracking-wider uppercase transition-all ${
+                viewMode === 'kitchen'
+                  ? 'bg-accent text-surface border-2 border-accent'
+                  : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
+              }`}
+            >
+              Kitchen View
             </button>
           </div>
 
@@ -113,6 +136,14 @@ function App() {
           ) : viewMode === 'analytics' ? (
             <div className="h-[calc(100vh-180px)] border border-ui-border bg-surface shadow-xl">
               <AnalyticsHub />
+            </div>
+          ) : viewMode === 'customer' ? (
+            <div className="h-[calc(100vh-180px)] border border-ui-border bg-surface shadow-xl">
+              <CustomerView />
+            </div>
+          ) : viewMode === 'kitchen' ? (
+            <div className="h-[calc(100vh-180px)] border border-ui-border bg-surface shadow-xl">
+              <KitchenView />
             </div>
           ) : (
             <>
@@ -129,6 +160,13 @@ function App() {
                           <ImpactGraph result={impactResult} simResult={simResult} />
                         </div>
                       </ErrorBoundary>
+
+                      {/* Recall Notification Center - Only show for contaminated batches */}
+                      {impactResult.investigation_type === 'batch' && impactResult.batch?.status === 'CONTAMINATED' && (
+                        <div className="pt-8">
+                          <RecallNotificationCenter result={impactResult} />
+                        </div>
+                      )}
 
                       <div className="border-t border-ui-border pt-12">
                         <ImpactSummary result={impactResult} simResult={simResult} />

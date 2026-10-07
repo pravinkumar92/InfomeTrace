@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+﻿import { useMemo, useState, useCallback, useEffect } from 'react';
 import ReactFlow, { 
   Background, 
   Controls, 
@@ -44,20 +44,21 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
     
     const baseNodeStyle = {
       color: '#FFFFFF',
-      width: 160,
-      padding: '16px 10px',
-      fontSize: '11px',
+      width: 120,
+      padding: '8px 6px',
+      fontSize: '9px',
       fontFamily: 'var(--font-mono)',
       textAlign: 'center' as const,
       border: '2px solid transparent',
       borderRadius: '4px',
-      transition: 'all 0.2s ease',
       fontWeight: 'bold',
-      letterSpacing: '0.05em',
+      letterSpacing: '0.02em',
       cursor: 'pointer',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+      transition: 'all 0.3s ease-in-out',
+      opacity: 1
     };
-    
+
     const getStatusColor = (status: string) => {
       switch(status) {
         case 'RECALLED': return '#C41E3A';
@@ -136,12 +137,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
       newNodes.push({
         id: `b-${result.batch.id}`,
         data: { 
-          label: `🔴 BATCH\n${result.batch.id}\n[${batchStatus}]`,
+          label: `ðŸ”´ BATCH\n${result.batch.id}\n[${batchStatus}]`,
           type: 'batch' as const,
           id: result.batch.id,
           details: result.batch
         },
-        position: { x: 50, y: 150 },
+        position: { x: 100, y: 250 },
         style: { 
           ...baseNodeStyle, 
           background: getStatusColor(batchStatus),
@@ -165,9 +166,9 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
           // Fade if this kitchen is from a different city than the selected one
           if (selectedCity && k.city !== selectedCity) {
             shouldFade = true;
-            console.log(`✗ Fading kitchen ${k.id} (${k.city}) - different city than ${selectedCity}`);
+            console.log(`âœ— Fading kitchen ${k.id} (${k.city}) - different city than ${selectedCity}`);
           } else {
-            console.log(`✓ Keeping bright: kitchen ${k.id} (${k.city})`);
+            console.log(`âœ“ Keeping bright: kitchen ${k.id} (${k.city})`);
           }
         }
         
@@ -178,12 +179,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `k-${k.id}`,
           data: { 
-            label: `🏭 KITCHEN\n${k.id}\n${k.name}`,
+            label: `ðŸ­ KITCHEN\n${k.id}\n${k.name}`,
             type: 'kitchen' as const,
             id: k.id,
             details: k
           },
-          position: { x: 350, y: 50 + i * 140 },
+          position: { x: 300, y: 50 + i * 80 },
           style: kStyle
         });
         const edgeId = `e-b-${result.batch?.id}-k-${k.id}`;
@@ -213,12 +214,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `d-${d.id}`,
           data: { 
-            label: `🍽️ DISH\n${d.id}\n${d.name}`,
+            label: `ðŸ½ï¸ DISH\n${d.id}\n${d.name}`,
             type: 'dish' as const,
             id: d.id,
             details: d
           },
-          position: { x: 650, y: 50 + i * 100 },
+          position: { x: 500, y: 50 + i * 60 },
           style: dStyle
         });
         
@@ -255,12 +256,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `o-${o.id}`,
           data: { 
-            label: `📦 ORDER\n${o.id}\n${o.timestamp.substring(0,10)}`,
+            label: `ðŸ“¦ ORDER\n${o.id}\n${o.timestamp.substring(0,10)}`,
             type: 'order' as const,
             id: o.id,
             details: o
           },
-          position: { x: 950, y: 50 + i * 75 },
+          position: { x: 700, y: 50 + i * 50 },
           style: oStyle
         });
         result.dishes.forEach(d => {
@@ -286,12 +287,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `c-${c.id}`,
           data: { 
-            label: `👤 CUSTOMER\n${c.id}\n${c.name}`,
+            label: `ðŸ‘¤ CUSTOMER\n${c.id}\n${c.name}`,
             type: 'customer' as const,
             id: c.id,
             details: c
           },
-          position: { x: 1250, y: 50 + i * 75 },
+          position: { x: 900, y: 50 + i * 50 },
           style: cStyle
         });
         result.orders.forEach(o => {
@@ -318,12 +319,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
       newNodes.push({
         id: `o-${orderData.order.id}`,
         data: { 
-          label: `📦 ORDER\n${orderData.order.id}\n${orderData.order.timestamp?.substring(0,10) || 'N/A'}`,
+          label: `ðŸ“¦ ORDER\n${orderData.order.id}\n${orderData.order.timestamp?.substring(0,10) || 'N/A'}`,
           type: 'order' as const,
           id: orderData.order.id,
           details: orderData.order
         },
-        position: { x: 50, y: 150 },
+        position: { x: 100, y: 250 },
         style: { 
           ...baseNodeStyle, 
           background: getStatusColor(orderData.order.status || 'COMPLETED'),
@@ -336,7 +337,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `c-${orderData.customer.id}`,
           data: { 
-            label: `👤 CUSTOMER\n${orderData.customer.id}\n${orderData.customer.name}`,
+            label: `ðŸ‘¤ CUSTOMER\n${orderData.customer.id}\n${orderData.customer.name}`,
             type: 'customer' as const,
             id: orderData.customer.id,
             details: orderData.customer
@@ -365,7 +366,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `d-${d.id}`,
           data: { 
-            label: `🍽️ DISH\n${d.id}\n${d.name}`,
+            label: `ðŸ½ï¸ DISH\n${d.id}\n${d.name}`,
             type: 'dish' as const,
             id: d.id,
             details: d
@@ -396,12 +397,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `k-${k.id}`,
           data: { 
-            label: `🏭 KITCHEN\n${k.id}\n${k.name}`,
+            label: `ðŸ­ KITCHEN\n${k.id}\n${k.name}`,
             type: 'kitchen' as const,
             id: k.id,
             details: k
           },
-          position: { x: 650, y: 50 + i * 100 },
+          position: { x: 500, y: 50 + i * 60 },
           style: { 
             ...baseNodeStyle, 
             background: getStatusColor(k.status || 'ACTIVE')
@@ -428,7 +429,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `b-${b.id}`,
           data: { 
-            label: `🔴 BATCH\n${b.id}\n${b.ingredient}`,
+            label: `ðŸ”´ BATCH\n${b.id}\n${b.ingredient}`,
             type: 'batch' as const,
             id: b.id,
             details: b
@@ -460,7 +461,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `s-${s.id}`,
           data: { 
-            label: `🚚 SUPPLIER\n${s.id}\n${s.name}`,
+            label: `ðŸšš SUPPLIER\n${s.id}\n${s.name}`,
             type: 'customer' as const,
             id: s.id,
             details: s
@@ -497,12 +498,12 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
       newNodes.push({
         id: `c-${customerData.customer.id}`,
         data: { 
-          label: `👤 CUSTOMER\n${customerData.customer.id}\n${customerData.customer.name}`,
+          label: `ðŸ‘¤ CUSTOMER\n${customerData.customer.id}\n${customerData.customer.name}`,
           type: 'customer' as const,
           id: customerData.customer.id,
           details: customerData.customer
         },
-        position: { x: 50, y: 150 },
+        position: { x: 100, y: 250 },
         style: { 
           ...baseNodeStyle, 
           background: '#AEB4B9',
@@ -517,7 +518,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `o-${o.id}`,
           data: { 
-            label: `📦 ORDER\n${o.id}\n${o.timestamp?.substring(0,10) || 'N/A'}`,
+            label: `ðŸ“¦ ORDER\n${o.id}\n${o.timestamp?.substring(0,10) || 'N/A'}`,
             type: 'order' as const,
             id: o.id,
             details: o
@@ -547,7 +548,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `d-${d.id}`,
           data: { 
-            label: `🍽️ DISH\n${d.id}\n${d.name}`,
+            label: `ðŸ½ï¸ DISH\n${d.id}\n${d.name}`,
             type: 'dish' as const,
             id: d.id,
             details: d
@@ -580,7 +581,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `k-${k.id}`,
           data: { 
-            label: `🏭 KITCHEN\n${k.id}\n${k.name}`,
+            label: `ðŸ­ KITCHEN\n${k.id}\n${k.name}`,
             type: 'kitchen' as const,
             id: k.id,
             details: k
@@ -612,7 +613,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         newNodes.push({
           id: `b-${b.id}`,
           data: { 
-            label: `🔴 BATCH\n${b.id}\n${b.ingredient}`,
+            label: `ðŸ”´ BATCH\n${b.id}\n${b.ingredient}`,
             type: 'batch' as const,
             id: b.id,
             details: b
@@ -659,6 +660,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
     console.log('initialNodes count:', initialNodes.length);
     console.log('initialEdges count:', initialEdges.length);
     setNodes(initialNodes);
+
     setEdges(initialEdges);
   }, [initialNodes, initialEdges, setNodes, setEdges]);
 
@@ -688,7 +690,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
     return (
       <div className="h-full w-full flex items-center justify-center bg-surface">
         <div className="text-center max-w-md p-8">
-          <div className="text-6xl mb-4">❌</div>
+          <div className="text-6xl mb-4">âŒ</div>
           <div className="text-xl font-bold text-ink mb-2">Graph Rendering Error</div>
           <div className="text-sm text-muted mb-4">{renderError}</div>
           <div className="text-xs text-muted font-mono bg-ui-bg p-3 rounded">
@@ -704,7 +706,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
     return (
       <div className="h-full w-full flex items-center justify-center bg-surface">
         <div className="text-center max-w-md p-8">
-          <div className="text-6xl mb-4">⚠️</div>
+          <div className="text-6xl mb-4">âš ï¸</div>
           <div className="text-xl font-bold text-ink mb-2">No Graph Data</div>
           <div className="text-sm text-muted mb-4">
             No nodes or edges were created for this investigation.
@@ -722,10 +724,10 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
       <Panel position="top-left" className="bg-transparent">
         <div className="flex items-center gap-3">
           <h2 className="text-[10px] font-bold text-ink tracking-widest uppercase bg-surface px-3 py-1.5 border border-ui-border shadow-sm">
-            📊 Traceability Graph
+            ðŸ“Š Traceability Graph
           </h2>
           <div className="text-[9px] font-mono text-muted bg-surface px-2 py-1 border border-ui-border">
-            {nodes.length} nodes • {edges.length} edges
+            {nodes.length} nodes â€¢ {edges.length} edges
           </div>
           {simResult && (
             <div className="flex items-center gap-2 bg-simulation-soft px-3 py-1.5 border border-simulation shadow-sm animate-pulse">
@@ -763,8 +765,8 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
             <div className="mt-3 pt-2 border-t border-ui-border">
               <div className="text-[9px] font-bold tracking-widest uppercase text-ink mb-1">Simulation</div>
               <div className="flex items-center gap-2 text-[9px]">
-                <span className="text-ink font-bold">● Contained</span>
-                <span className="text-muted opacity-50">○ Remaining</span>
+                <span className="text-ink font-bold">â— Contained</span>
+                <span className="text-muted opacity-50">â—‹ Remaining</span>
               </div>
             </div>
           )}
@@ -785,7 +787,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
                 onClick={closeDetail}
                 className="text-surface hover:text-accent transition-colors text-lg font-bold leading-none"
               >
-                ×
+                Ã—
               </button>
             </div>
             <div className="p-4 space-y-3">
@@ -814,7 +816,7 @@ const ImpactGraphInner: React.FC<Props> = ({ result, simResult }) => {
         fitViewOptions={{ padding: 0.15, duration: 800 }} 
         minZoom={0.1} 
         maxZoom={2}
-        defaultEdgeOptions={{ type: 'smoothstep' }}
+        defaultEdgeOptions={{ type: 'straight' }}
       >
         <Background color="#D9DADD" gap={24} size={1} />
         <Controls 
@@ -834,3 +836,10 @@ export const ImpactGraph: React.FC<Props> = (props) => {
     </ReactFlowProvider>
   );
 };
+
+
+
+
+
+
+

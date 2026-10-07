@@ -22,11 +22,9 @@ export const RecallSimulator: React.FC<Props> = ({ result, onApplyRecall, isReca
     console.log('Kitchens:', result?.kitchens);
   }, []);
 
-  if (!result || !result.batch) return null;
+  if (!result || !result.batch || result.batch.status === 'CONTAMINATED') return null;
 
-  const isContaminated = result.batch.status === 'CONTAMINATED';
-
-  const handleSimulate = async () => {
+    const handleSimulate = async () => {
     if (!selectedKitchen) {
       console.error('No kitchen selected!');
       return;
@@ -72,138 +70,117 @@ export const RecallSimulator: React.FC<Props> = ({ result, onApplyRecall, isReca
       <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-ui-border">
         <div className="w-3 h-3 rounded-full bg-simulation animate-pulse"></div>
         <h2 className="text-sm font-bold text-ink tracking-widest uppercase">
-          {isContaminated ? 'Post-Incident State' : 'Operational Simulation'}
+          Operational Simulation
         </h2>
       </div>
       
-      {!isContaminated ? (
-        <>
-          <div className="mb-6">
-            <h3 className="text-xs font-bold text-ink uppercase tracking-widest mb-2">Counterfactual Containment</h3>
-            <p className="text-[10px] text-muted leading-relaxed">
-              Simulate early containment at a specific kitchen to assess impact reduction.
-            </p>
-          </div>
+      <div className="mb-6">
+        <h3 className="text-xs font-bold text-ink uppercase tracking-widest mb-2">Counterfactual Containment</h3>
+        <p className="text-[10px] text-muted leading-relaxed">
+          Simulate early containment at a specific kitchen to assess impact reduction.
+        </p>
+      </div>
+      
+      <div className="mb-8 border-2 border-simulation bg-simulation-soft/20 p-6 rounded-sm">
+        <label className="block text-[11px] font-bold text-simulation uppercase tracking-widest mb-4 flex items-center gap-2">
+          <span className="text-simulation">?</span>
+          Select Containment Point
+        </label>
+        <div className="flex flex-col gap-4">
+          <select 
+            value={selectedKitchen}
+            onChange={(e) => {
+              console.log('=== DROPDOWN CHANGED ===');
+              console.log('Selected value:', e.target.value);
+              setSelectedKitchen(e.target.value);
+            }}
+            className="w-full bg-surface border-2 border-ui-border px-4 py-3 text-sm text-ink focus:outline-none focus:border-simulation font-mono uppercase transition-colors hover:border-simulation/50"
+          >
+            <option value="">??? Select Kitchen ???</option>
+            {Array.from(new Set(result.kitchens.map(k => k.city || 'Unknown'))).sort().map(city => (
+              <optgroup key={city} label={`??? ${city.toUpperCase()} ???`}>
+                {result.kitchens
+                  .filter(k => (k.city || 'Unknown') === city)
+                  .map(k => (
+                    <option key={k.id} value={k.id}>
+                      {k.name} ({k.id})
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
           
-          <div className="mb-8 border-2 border-simulation bg-simulation-soft/20 p-6 rounded-sm">
-            <label className="block text-[11px] font-bold text-simulation uppercase tracking-widest mb-4 flex items-center gap-2">
-              <span className="text-simulation">●</span>
-              Select Containment Point
-            </label>
-            <div className="flex flex-col gap-4">
-              <select 
-                value={selectedKitchen}
-                onChange={(e) => {
-                  console.log('=== DROPDOWN CHANGED ===');
-                  console.log('Selected value:', e.target.value);
-                  setSelectedKitchen(e.target.value);
-                }}
-                className="w-full bg-surface border-2 border-ui-border px-4 py-3 text-sm text-ink focus:outline-none focus:border-simulation font-mono uppercase transition-colors hover:border-simulation/50"
-              >
-                <option value="">━━━ Select Kitchen ━━━</option>
-                {/* Group kitchens by city */}
-                {Array.from(new Set(result.kitchens.map(k => k.city || 'Unknown'))).sort().map(city => (
-                  <optgroup key={city} label={`━━━ ${city.toUpperCase()} ━━━`}>
-                    {result.kitchens
-                      .filter(k => (k.city || 'Unknown') === city)
-                      .map(k => (
-                        <option key={k.id} value={k.id}>
-                          {k.name} ({k.id})
-                        </option>
-                      ))}
-                  </optgroup>
-                ))}
-              </select>
-              
-              <div className="flex gap-3">
-                <button 
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('=== SIMULATE BUTTON CLICKED ===');
-                    console.log('Selected Kitchen:', selectedKitchen);
-                    console.log('Batch ID:', result?.batch?.id);
-                    console.log('isSimulating:', isSimulating);
-                    if (selectedKitchen && !isSimulating) {
-                      handleSimulate();
-                    } else {
-                      console.log('Button click ignored - conditions not met');
-                    }
-                  }}
-                  disabled={!selectedKitchen || isSimulating}
-                  className="flex-1 bg-simulation hover:bg-simulation/80 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-3 font-bold text-xs tracking-widest uppercase transition-all cursor-pointer border-2 border-transparent hover:border-simulation disabled:hover:border-transparent"
-                  style={{ pointerEvents: 'auto' }}
-                >
-                  {isSimulating ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                      SIMULATING...
-                    </span>
-                  ) : (
-                    '▶ RUN SIMULATION'
-                  )}
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    console.log('=== RESET BUTTON CLICKED ===');
-                    handleResetSim();
-                  }}
-                  className="px-5 bg-surface text-ink font-bold text-xs tracking-widest uppercase hover:bg-ui-border transition-colors border-2 border-ui-border hover:border-ink"
-                >
-                  ↻ RESET
-                </button>
-              </div>
-            </div>
-            
-            {simError && (
-              <div className="mt-4 p-3 bg-critical/10 border-2 border-critical">
-                <div className="text-[10px] text-critical font-bold font-mono tracking-widest uppercase">
-                  ⚠ {simError}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="border-t-2 border-ui-border pt-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 rounded-full bg-critical"></div>
-              <h3 className="text-xs font-bold text-ink uppercase tracking-widest">Execute Recall</h3>
-            </div>
-            <p className="text-[10px] text-muted mb-6 leading-relaxed">
-              Mark this batch as contaminated and update all connected entities in the graph database.
-            </p>
+          <div className="flex gap-3">
             <button 
-              onClick={onApplyRecall}
-              disabled={isRecalling}
-              className="bg-critical hover:bg-maroon disabled:opacity-50 text-white px-8 py-4 font-bold tracking-widest uppercase text-xs transition-all w-full border-2 border-transparent hover:border-white disabled:hover:border-transparent shadow-lg hover:shadow-xl"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('=== SIMULATE BUTTON CLICKED ===');
+                console.log('Selected Kitchen:', selectedKitchen);
+                console.log('Batch ID:', result?.batch?.id);
+                console.log('isSimulating:', isSimulating);
+                if (selectedKitchen && !isSimulating) {
+                  handleSimulate();
+                } else {
+                  console.log('Button click ignored - conditions not met');
+                }
+              }}
+              disabled={!selectedKitchen || isSimulating}
+              className="flex-1 bg-simulation hover:bg-simulation/80 disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-3 font-bold text-xs tracking-widest uppercase transition-all cursor-pointer border-2 border-transparent hover:border-simulation disabled:hover:border-transparent"
+              style={{ pointerEvents: 'auto' }}
             >
-              {isRecalling ? '⚠ EXECUTING RECALL...' : '⚠ APPLY RECALL'}
+              {isSimulating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                  SIMULATING...
+                </span>
+              ) : (
+                '? RUN SIMULATION'
+              )}
+            </button>
+            <button 
+              type="button"
+              onClick={() => {
+                console.log('=== RESET BUTTON CLICKED ===');
+                handleResetSim();
+              }}
+              className="px-5 bg-surface text-ink font-bold text-xs tracking-widest uppercase hover:bg-ui-border transition-colors border-2 border-ui-border hover:border-ink"
+            >
+              ? RESET
             </button>
           </div>
-          {recallError && (
-            <div className="mt-4 p-3 bg-critical/10 border-2 border-critical">
-              <div className="text-[10px] text-critical font-bold font-mono tracking-widest uppercase">
-                ⚠ {recallError}
-              </div>
+        </div>
+        
+        {simError && (
+          <div className="mt-4 p-3 bg-critical/10 border-2 border-critical">
+            <div className="text-[10px] text-critical font-bold font-mono tracking-widest uppercase">
+              ? {simError}
             </div>
-          )}
-        </>
-      ) : (
-        <div className="text-center py-8 bg-canvas border border-ui-border mt-4">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="w-2 h-2 rounded-full bg-verified animate-pulse"></div>
-            <div className="text-[10px] font-bold text-verified uppercase tracking-widest">RECALL VERIFIED</div>
           </div>
-          <div className="text-4xl font-bold text-ink mb-4 font-mono">{result.batch.id}</div>
-          <div className="text-xs font-bold text-critical uppercase tracking-widest mb-8 border border-critical inline-block px-4 py-1">
-            CONTAMINATED
-          </div>
-          <div className="block">
-            <div className="text-[10px] font-bold text-verified bg-verified-soft inline-block px-6 py-2 uppercase tracking-widest border border-verified">
-              ✓ VERIFIED FROM LIVE NEO4J GRAPH
-            </div>
+        )}
+      </div>
+
+      <div className="border-t-2 border-ui-border pt-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-3 h-3 rounded-full bg-critical"></div>
+          <h3 className="text-xs font-bold text-ink uppercase tracking-widest">Execute Recall</h3>
+        </div>
+        <p className="text-[10px] text-muted mb-6 leading-relaxed">
+          Mark this batch as contaminated and update all connected entities in the graph database.
+        </p>
+        <button 
+          onClick={onApplyRecall}
+          disabled={isRecalling}
+          className="bg-critical hover:bg-maroon disabled:opacity-50 text-white px-8 py-4 font-bold tracking-widest uppercase text-xs transition-all w-full border-2 border-transparent hover:border-white disabled:hover:border-transparent shadow-lg hover:shadow-xl"
+        >
+          {isRecalling ? '? EXECUTING RECALL...' : '? APPLY RECALL'}
+        </button>
+      </div>
+      {recallError && (
+        <div className="mt-4 p-3 bg-critical/10 border-2 border-critical">
+          <div className="text-[10px] text-critical font-bold font-mono tracking-widest uppercase">
+            ? {recallError}
           </div>
         </div>
       )}
