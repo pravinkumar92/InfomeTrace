@@ -1,19 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Activity } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 const Header = () => {
-  const [statusCount, setStatusCount] = useState<number | null>(null);
-  const [isOnline, setIsOnline] = useState(true);
-
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/status/audit');
-        const data = await response.json();
-        setStatusCount(data.count);
-        setIsOnline(true);
+        await fetch('http://127.0.0.1:8000/api/status/audit');
       } catch {
-        setIsOnline(false);
+        // Status check failed
       }
     };
 

@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle, XCircle, Clock, RefreshCw, Database } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 
 interface StatusEntity {
   entity_type: string;
@@ -83,7 +83,6 @@ export const StatusDashboard: React.FC = () => {
     SUSPENDED: statusData.entities.filter(e => e.status === 'SUSPENDED').length,
   };
 
-  const totalCritical = countByStatus.RECALLED + countByStatus.SUSPENDED;
   const hasActiveIncidents = statusData.count > 0;
 
   const getStatusColor = (status: string) => {

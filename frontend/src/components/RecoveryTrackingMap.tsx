@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapPin, Truck, CheckCircle2, Clock, Package, ArrowRight, Play, Pause } from 'lucide-react';
+import { MapPin, Truck, CheckCircle2, Clock, Package, Play, Pause } from 'lucide-react';
 
 interface Kitchen {
   id: string;
@@ -34,12 +34,11 @@ const KITCHEN_LOCATIONS: Record<string, { lat: number; lng: number }> = {
 
 const SUPPLIER_LOCATION = { lat: 28.4089, lng: 77.3178 }; // Faridabad (supplier hub)
 
-export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocation, totalQuantity }: RecoveryTrackingMapProps) {
+export default function RecoveryTrackingMap({ kitchens, totalQuantity }: RecoveryTrackingMapProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [vehiclePosition, setVehiclePosition] = useState(SUPPLIER_LOCATION);
   const [isSimulating, setIsSimulating] = useState(false);
   const [collectedKitchens, setCollectedKitchens] = useState<Set<string>>(new Set());
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Prepare kitchen data with locations
   const trackingKitchens: Kitchen[] = kitchens
@@ -65,18 +64,10 @@ export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocatio
           return prev;
         }
 
-        // Update vehicle position
-        if (prev === 0) {
-          // Starting from supplier
-          setVehiclePosition(SUPPLIER_LOCATION);
-        } else if (prev <= trackingKitchens.length) {
-          // Moving to kitchen
+        // Update kitchen collection status
+        if (prev > 0 && prev <= trackingKitchens.length) {
           const kitchen = trackingKitchens[prev - 1];
-          setVehiclePosition(kitchen.location);
-          setCollectedKitchens(prev => new Set([...prev, kitchen.id]));
-        } else {
-          // Returning to supplier
-          setVehiclePosition(SUPPLIER_LOCATION);
+          setCollectedKitchens(prevSet => new Set([...prevSet, kitchen.id]));
         }
 
         return prev + 1;
@@ -93,7 +84,6 @@ export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocatio
       // Reset
       setCurrentStep(0);
       setCollectedKitchens(new Set());
-      setVehiclePosition(SUPPLIER_LOCATION);
     }
     setIsSimulating(!isSimulating);
   };
@@ -118,7 +108,7 @@ export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocatio
       <div className="border-b border-ui-border p-4 flex items-center justify-between">
         <div>
           <h3 className="text-[10px] font-bold text-muted tracking-widest uppercase mb-1">Recovery Vehicle Tracking</h3>
-          <p className="text-sm font-bold text-ink">Batch {batchId} Collection Route</p>
+          <p className="text-sm font-bold text-ink">Batch Collection Route</p>
         </div>
         <button
           onClick={toggleSimulation}
@@ -176,7 +166,7 @@ export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocatio
                   <MapPin className="w-6 h-6 text-accent relative z-10" />
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
                     <div className="text-[10px] font-bold text-accent uppercase">Supplier Hub</div>
-                    <div className="text-[8px] text-muted">{supplierLocation}</div>
+                    <div className="text-[8px] text-muted">Faridabad</div>
                   </div>
                 </div>
               </div>
@@ -323,7 +313,7 @@ export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocatio
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold text-ink">Supplier Hub - Departure</div>
-                  <div className="text-[10px] text-muted mt-1">{supplierLocation}</div>
+                  <div className="text-[10px] text-muted mt-1">Faridabad</div>
                   {getStepStatus(0) === 'completed' && (
                     <div className="text-[10px] text-accent font-bold mt-1">Started collection route</div>
                   )}
@@ -397,7 +387,7 @@ export default function RecoveryTrackingMap({ batchId, kitchens, supplierLocatio
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold text-ink">Supplier Hub - Return</div>
-                  <div className="text-[10px] text-muted mt-1">{supplierLocation}</div>
+                  <div className="text-[10px] text-muted mt-1">Faridabad</div>
                   {getStepStatus(totalStops - 1) === 'completed' && (
                     <div className="bg-accent/10 border border-accent/30 px-3 py-2 rounded mt-2">
                       <div className="text-xs font-bold text-accent">Collection Complete!</div>

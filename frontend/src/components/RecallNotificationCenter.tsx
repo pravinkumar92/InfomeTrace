@@ -61,7 +61,6 @@ Reference: RECALL-${batchId}-${new Date().toISOString().split('T')[0]}`;
     const messageToSend = messageTemplate === 'auto' ? generateAutoMessage() : customMessage;
 
     try {
-      const promises = [];
       let successCount = 0;
       let failCount = 0;
 

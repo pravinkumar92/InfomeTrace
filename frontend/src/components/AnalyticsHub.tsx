@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { InvestigationResponse } from '../api/types';
 
 interface RiskScore {
   batch_id: string;

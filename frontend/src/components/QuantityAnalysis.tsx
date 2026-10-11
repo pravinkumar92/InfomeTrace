@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { AlertCircle, TrendingDown, Leaf, Factory, Package, DollarSign, Truck, Phone, Mail, Star, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import QuantityFlowGraph from './QuantityFlowGraph';
 import RecoveryTrackingMap from './RecoveryTrackingMap';
 import { investigateEntity } from '../api/investigation';
@@ -25,21 +25,6 @@ interface BatchBreakdown {
   total_contaminated: number;
   unit: string;
   kitchens: KitchenQuantity[];
-}
-
-interface RecoveryPartner {
-  id: string;
-  name: string;
-  type: string;
-  location: string;
-  rate_per_kg: number;
-  minimum_quantity: number;
-  accepted_waste_types: string[];
-  transportation_cost_per_km: number;
-  rating: number;
-  contact_phone: string;
-  contact_email: string;
-  status: string;
 }
 
 interface RecoverySimulation {
@@ -82,56 +67,12 @@ const API_URL = 'http://127.0.0.1:8000';
 
 export default function QuantityAnalysis() {
   const [batchId, setBatchId] = useState('B002');
-  const [availableBatches, setAvailableBatches] = useState<Array<{id: string, ingredient: string, status: string}>>([]);
   const [impactResult, setImpactResult] = useState<InvestigationResponse | null>(null);
   const [batchBreakdown, setBatchBreakdown] = useState<BatchBreakdown | null>(null);
-  const [partners, setPartners] = useState<RecoveryPartner[]>([]);
   const [simulation, setSimulation] = useState<RecoverySimulation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
-
-  // Fetch available batches on mount
-  useEffect(() => {
-    const fetchBatches = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/quantity/batches`);
-        if (response.ok) {
-          const data = await response.json();
-          setAvailableBatches(data.batches || []);
-        }
-      } catch (err) {
-        console.error('Error fetching batches:', err);
-      }
-    };
-    fetchBatches();
-  }, []);
-
-  const fetchBatchBreakdown = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch(`${API_URL}/api/quantity/batch/${batchId}`);
-      if (!response.ok) throw new Error('Failed to fetch batch breakdown');
-      const data = await response.json();
-      setBatchBreakdown(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPartners = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/quantity/partners`);
-      if (!response.ok) throw new Error('Failed to fetch partners');
-      const data = await response.json();
-      setPartners(data.partners || []);
-    } catch (err) {
-      console.error('Error fetching partners:', err);
-    }
-  };
 
   const handleAnalyze = async () => {
     if (!batchId.trim()) return;
@@ -146,45 +87,23 @@ export default function QuantityAnalysis() {
       setImpactResult(investigationData);
       
       // Fetch all data in parallel
-      const [batchResponse, partnersResponse, simulationResponse] = await Promise.all([
+      const [batchResponse, simulationResponse] = await Promise.all([
         fetch(`${API_URL}/api/quantity/batch/${batchId}`),
-        fetch(`${API_URL}/api/quantity/partners`),
         fetch(`${API_URL}/api/quantity/recovery/simulate?batch_id=${batchId}`, { method: 'POST' })
       ]);
       
       if (!batchResponse.ok) throw new Error('Failed to fetch batch data');
-      if (!partnersResponse.ok) throw new Error('Failed to fetch partners');
       if (!simulationResponse.ok) throw new Error('Failed to simulate recovery');
       
       const batchData = await batchResponse.json();
-      const partnersData = await partnersResponse.json();
       const simulationData = await simulationResponse.json();
       
       setBatchBreakdown(batchData);
-      setPartners(partnersData.partners || []);
       setSimulation(simulationData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getPartnerIcon = (type: string) => {
-    switch (type) {
-      case 'FERTILIZER': return <Leaf className="w-5 h-5" />;
-      case 'BIOGAS': return <Factory className="w-5 h-5" />;
-      case 'COMPOST': return <Package className="w-5 h-5" />;
-      default: return <Package className="w-5 h-5" />;
-    }
-  };
-
-  const getPartnerColor = (type: string) => {
-    switch (type) {
-      case 'FERTILIZER': return 'bg-green-500';
-      case 'BIOGAS': return 'bg-blue-500';
-      case 'COMPOST': return 'bg-amber-500';
-      default: return 'bg-gray-500';
     }
   };
 

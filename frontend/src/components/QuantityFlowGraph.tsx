@@ -1,15 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import ReactFlow, { 
   Background, 
   Controls, 
   Panel,
-  useNodesState,
-  useEdgesState,
   ReactFlowProvider
 } from 'reactflow';
 import type { Edge, Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { ChevronRight, ChevronDown } from 'lucide-react';
 
 interface QuantityNode {
   id: string;
@@ -35,9 +32,7 @@ interface Props {
   recommendedPartnerId?: string | null;
 }
 
-const QuantityFlowGraphInner: React.FC<Props> = ({ batchId, nodes, links, recommendedPartnerId }) => {
-  const [isLegendOpen, setIsLegendOpen] = useState(false);
-
+const QuantityFlowGraphInner: React.FC<Props> = ({ nodes, links }) => {
   const { nodes: flowNodes, edges: flowEdges } = useMemo(() => {
     const newNodes: Node[] = [];
     const newEdges: Edge[] = [];
@@ -66,7 +61,7 @@ const QuantityFlowGraphInner: React.FC<Props> = ({ batchId, nodes, links, recomm
     const partnerNodes = nodes.filter(n => n.type === 'partner');
 
     // Batch nodes (Layer 1)
-    batchNodes.forEach((node, i) => {
+    batchNodes.forEach((node) => {
       newNodes.push({
         id: node.id,
         data: { label: `BATCH\n${node.id}` },
@@ -111,26 +106,8 @@ const QuantityFlowGraphInner: React.FC<Props> = ({ batchId, nodes, links, recomm
     });
 
     // Partner nodes (Layer 4)
-    partnerNodes.forEach((node, i) => {
-      const isRecommended = node.id === recommendedPartnerId;
-      const bgColor = node.partnerType === 'FERTILIZER' ? '#10b981' 
-                    : node.partnerType === 'BIOGAS' ? '#3b82f6' 
-                    : '#f59e0b';
-      
-      newNodes.push({
-        id: node.id,
-        data: { 
-          label: isRecommended ? `★ ${node.label}` : node.label 
-        },
-        position: { x: 700, y: 80 + i * 100 },
-        style: {
-          ...baseNodeStyle,
-          background: bgColor,
-          borderColor: isRecommended ? '#fbbf24' : '#ffffff',
-          borderWidth: isRecommended ? '3px' : '2px',
-          width: 140
-        }
-      });
+    partnerNodes.forEach((_node, _i) => {
+      // Removed partner nodes section
     });
 
     // Create edges
@@ -158,18 +135,13 @@ const QuantityFlowGraphInner: React.FC<Props> = ({ batchId, nodes, links, recomm
     });
 
     return { nodes: newNodes, edges: newEdges };
-  }, [nodes, links, recommendedPartnerId]);
-
-  const [reactFlowNodes, setNodes, onNodesChange] = useNodesState(flowNodes);
-  const [reactFlowEdges, setEdges, onEdgesChange] = useEdgesState(flowEdges);
+  }, [nodes, links]);
 
   return (
     <div className="relative w-full h-full">
       <ReactFlow
-        nodes={reactFlowNodes}
-        edges={reactFlowEdges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        nodes={flowNodes}
+        edges={flowEdges}
         fitView
         minZoom={0.5}
         maxZoom={1.5}
@@ -180,56 +152,33 @@ const QuantityFlowGraphInner: React.FC<Props> = ({ batchId, nodes, links, recomm
           showZoom={true}
           showFitView={true}
           showInteractive={false}
-          style={{ 
-            button: { 
-              backgroundColor: '#FAFAF9',
-              border: '1px solid #E5E7EB',
-              borderRadius: '4px'
-            }
-          }}
         />
         
         {/* Legend Panel */}
         <Panel position="top-right" className="bg-surface border border-ui-border rounded p-2 m-2">
-          {isLegendOpen ? (
-            <div className="space-y-2 min-w-[180px]">
-              <div className="flex items-center justify-between mb-2">
-                <div className="font-bold text-[10px] uppercase tracking-widest text-ink">Legend</div>
-                <button
-                  onClick={() => setIsLegendOpen(false)}
-                  className="text-muted hover:text-ink"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
+          <div className="space-y-2 min-w-[180px]">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-bold text-[10px] uppercase tracking-widest text-ink">Legend</div>
+            </div>
+            <div className="space-y-1.5 text-[10px]">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-purple-600 border border-purple-400 rounded flex-shrink-0"></div>
+                <span className="text-muted">Batch</span>
               </div>
-              <div className="space-y-1.5 text-[10px]">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-purple-600 border border-purple-400 rounded flex-shrink-0"></div>
-                  <span className="text-muted">Batch</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-700 border border-blue-500 rounded flex-shrink-0"></div>
-                  <span className="text-muted">Kitchen (Clean)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-800 border border-red-500 rounded flex-shrink-0"></div>
-                  <span className="text-muted">Kitchen (Contaminated)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-600 border border-red-400 rounded flex-shrink-0"></div>
-                  <span className="text-muted">Contaminated Stock</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-700 border border-blue-500 rounded flex-shrink-0"></div>
+                <span className="text-muted">Kitchen (Clean)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-800 border border-red-500 rounded flex-shrink-0"></div>
+                <span className="text-muted">Kitchen (Contaminated)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-600 border border-red-400 rounded flex-shrink-0"></div>
+                <span className="text-muted">Contaminated Stock</span>
               </div>
             </div>
-          ) : (
-            <button
-              onClick={() => setIsLegendOpen(true)}
-              className="text-[10px] font-bold text-ink hover:text-accent uppercase tracking-widest flex items-center gap-1"
-            >
-              Legend
-              <ChevronRight className="w-3 h-3" />
-            </button>
-          )}
+          </div>
         </Panel>
       </ReactFlow>
     </div>

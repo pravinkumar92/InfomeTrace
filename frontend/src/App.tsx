@@ -10,8 +10,6 @@ import { TraceAssist } from './components/TraceAssist';
 import { BackgroundAnimation } from './components/BackgroundAnimation';
 import { StatusDashboard } from './components/StatusDashboard';
 import { AnalyticsHub } from './components/AnalyticsHub';
-import { CustomerView } from './components/CustomerView';
-import { KitchenView } from './components/KitchenView';
 import QuantityAnalysis from './components/QuantityAnalysis';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { investigateEntity } from './api/investigation';

@@ -1,6 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline } from 'react-leaflet';
-import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix Leaflet default icon issue
@@ -85,14 +84,6 @@ export const SupplyMap: React.FC = () => {
     
     setLocations(mockLocations);
   }, []);
-
-  const getMarkerColor = (type: string, status: string) => {
-    if (status === 'CONTAMINATED' || status === 'RECALLED') return '#C41E3A';
-    if (type === 'kitchen') return '#C41E3A';
-    if (type === 'supplier') return '#27AE60';
-    if (type === 'customer') return '#315C7D';
-    return '#52545A';
-  };
 
   const filteredLocations = selectedType === 'all' 
     ? locations 
