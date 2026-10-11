@@ -1,5 +1,4 @@
 import logging
-import os
 from neo4j import GraphDatabase
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,31 +10,11 @@ class Settings(BaseSettings):
     neo4j_password: str
     neo4j_database: str = "neo4j"
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-flash-latest"
+    gemini_model: str = "gemini-2.5-flash"
     
-    model_config = SettingsConfigDict(
-        env_file=".env", 
-        env_file_encoding="utf-8", 
-        extra="ignore",
-        case_sensitive=False
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-# Debug: Print environment variables (remove after debugging)
-print("=" * 50)
-print("Environment Variables Check:")
-print(f"NEO4J_URI exists: {bool(os.getenv('NEO4J_URI'))}")
-print(f"NEO4J_USERNAME exists: {bool(os.getenv('NEO4J_USERNAME'))}")
-print(f"NEO4J_PASSWORD exists: {bool(os.getenv('NEO4J_PASSWORD'))}")
-print(f"GEMINI_API_KEY exists: {bool(os.getenv('GEMINI_API_KEY'))}")
-print("=" * 50)
-
-try:
-    settings = Settings()
-    print("✓ Settings loaded successfully")
-except Exception as e:
-    print(f"✗ Settings loading failed: {e}")
-    print(f"Error type: {type(e).__name__}")
-    raise
+settings = Settings()
 
 class Database:
     def __init__(self):

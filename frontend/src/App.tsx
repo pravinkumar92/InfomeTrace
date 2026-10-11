@@ -12,12 +12,13 @@ import { StatusDashboard } from './components/StatusDashboard';
 import { AnalyticsHub } from './components/AnalyticsHub';
 import { CustomerView } from './components/CustomerView';
 import { KitchenView } from './components/KitchenView';
+import QuantityAnalysis from './components/QuantityAnalysis';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { investigateEntity } from './api/investigation';
 import { recallBatch } from './api/recall';
 import type { InvestigationResponse, SimulateContainmentResponse } from './api/types';
 
-type ViewMode = 'dashboard' | 'investigation' | 'analytics' | 'customer' | 'kitchen';
+type ViewMode = 'dashboard' | 'investigation' | 'analytics' | 'customer' | 'kitchen' | 'quantity';
 
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
@@ -75,7 +76,7 @@ function App() {
       <BackgroundAnimation />
       <div className="relative z-10">
         <Layout>
-          {/* View Mode Switcher - 3 Core Tabs */}
+          {/* View Mode Switcher - Core Tabs */}
           <div className="mb-6 flex gap-2">
             <button
               onClick={() => setViewMode('dashboard')}
@@ -108,24 +109,14 @@ function App() {
               Risk Analytics
             </button>
             <button
-              onClick={() => setViewMode('customer')}
+              onClick={() => setViewMode('quantity')}
               className={`px-6 py-3 font-bold text-sm tracking-wider uppercase transition-all ${
-                viewMode === 'customer'
+                viewMode === 'quantity'
                   ? 'bg-accent text-surface border-2 border-accent'
                   : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
               }`}
             >
-              Customer View
-            </button>
-            <button
-              onClick={() => setViewMode('kitchen')}
-              className={`px-6 py-3 font-bold text-sm tracking-wider uppercase transition-all ${
-                viewMode === 'kitchen'
-                  ? 'bg-accent text-surface border-2 border-accent'
-                  : 'bg-surface text-ink border-2 border-ui-border hover:border-accent'
-              }`}
-            >
-              Kitchen View
+              Quantity & Recovery
             </button>
           </div>
 
@@ -137,13 +128,9 @@ function App() {
             <div className="h-[calc(100vh-180px)] border border-ui-border bg-surface shadow-xl">
               <AnalyticsHub />
             </div>
-          ) : viewMode === 'customer' ? (
-            <div className="h-[calc(100vh-180px)] border border-ui-border bg-surface shadow-xl">
-              <CustomerView />
-            </div>
-          ) : viewMode === 'kitchen' ? (
-            <div className="h-[calc(100vh-180px)] border border-ui-border bg-surface shadow-xl">
-              <KitchenView />
+          ) : viewMode === 'quantity' ? (
+            <div className="h-[calc(100vh-180px)]">
+              <QuantityAnalysis />
             </div>
           ) : (
             <>

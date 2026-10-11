@@ -8,6 +8,7 @@ from app.routes.assistant import router as assistant_router
 from app.routes.status import router as status_router
 from app.routes.recall import router as recall_router
 from app.routes.analytics import router as analytics_router
+from app.routes.quantity import router as quantity_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,10 +30,6 @@ app.add_middleware(
         "http://127.0.0.1:5174",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://*.vercel.app",  # Allow Vercel deployments
-        "https://*.netlify.app",  # Allow Netlify deployments
-        "https://*.onrender.com", # Allow Render frontend
-        # Add your production domain here when ready
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -44,6 +41,7 @@ app.include_router(assistant_router)
 app.include_router(status_router)
 app.include_router(recall_router)
 app.include_router(analytics_router)
+app.include_router(quantity_router)
 
 @app.get("/health")
 def health_check():
