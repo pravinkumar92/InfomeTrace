@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { API_URL } from '../config';
 
 interface StatusEntity {
   entity_type: string;
@@ -31,7 +32,7 @@ export const StatusDashboard: React.FC = () => {
 
   const fetchStatusAudit = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/status/audit');
+      const response = await fetch(`${API_URL}/api/status/audit`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

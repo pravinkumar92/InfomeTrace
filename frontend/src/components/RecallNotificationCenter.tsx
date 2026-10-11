@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import type { InvestigationResponse } from '../api/types';
+import { API_URL } from '../config';
 
 interface Props {
   result: InvestigationResponse | null;
@@ -68,7 +69,7 @@ Reference: RECALL-${batchId}-${new Date().toISOString().split('T')[0]}`;
       if (result.customers && result.customers.length > 0) {
         for (const customer of result.customers) {
           try {
-            const response = await fetch('http://127.0.0.1:8000/api/recall/action', {
+            const response = await fetch(`${API_URL}/api/recall/action`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -101,7 +102,7 @@ Reference: RECALL-${batchId}-${new Date().toISOString().split('T')[0]}`;
         for (const kitchen of result.kitchens) {
           try {
             // Create a simple recall action for kitchen with batch association
-            const response = await fetch('http://127.0.0.1:8000/api/recall/action', {
+            const response = await fetch(`${API_URL}/api/recall/action`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

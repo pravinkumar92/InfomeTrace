@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API_URL } from '../config';
 
 interface RiskScore {
   batch_id: string;
@@ -23,7 +24,7 @@ export const AnalyticsHub: React.FC = () => {
 
   const fetchRiskData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/analytics/risk');
+      const response = await fetch(`${API_URL}/api/analytics/risk`);
       if (!response.ok) {
         throw new Error('Failed to fetch risk analytics');
       }

@@ -4,6 +4,7 @@ import QuantityFlowGraph from './QuantityFlowGraph';
 import RecoveryTrackingMap from './RecoveryTrackingMap';
 import { investigateEntity } from '../api/investigation';
 import type { InvestigationResponse } from '../api/types';
+import { API_URL } from '../config';
 
 interface KitchenQuantity {
   kitchen_id: string;
@@ -62,8 +63,6 @@ interface RecoverySimulation {
     remaining: number;
   }[];
 }
-
-const API_URL = 'http://127.0.0.1:8000';
 
 export default function QuantityAnalysis() {
   const [batchId, setBatchId] = useState('B002');

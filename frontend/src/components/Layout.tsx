@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
+import { API_URL } from '../config';
 
 const Header = () => {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        await fetch('http://127.0.0.1:8000/api/status/audit');
+        await fetch(`${API_URL}/api/status/audit`);
       } catch {
         // Status check failed
       }
